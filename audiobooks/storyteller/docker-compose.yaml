@@ -1,0 +1,35 @@
+# Storyteller is a platform for immersive reading providing tools for creating, managing, and reading/listening to ebooks with guided narration.
+# I specifically use it to combine my books and audiobooks to create whispersync like experience.
+# Produces EPUB3 files with embedded audio, so can be used with any supporting tool.
+# Reference: https://storyteller-platform.gitlab.io/storyteller/
+services:
+  web:
+    image: registry.gitlab.com/storyteller-platform/storyteller:latest
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 256M
+    volumes:
+      - ./data:/data:rw
+      - ./Audiobooks:/library/imports/aubiobooks
+      - ./Books:/library/imports/books
+      - ./StoryBooks:/library/storybooks # My readaloud books go here
+    environment:
+      # IMPORTANT: Change `STORYTELLER_SECRET_KEY` to `STORYTELLER_SECRET_KEY_FILE, and
+      # set the value to exactly `/run/secrets/secret_key`
+      - STORYTELLER_SECRET_KEY_FILE=/run/secrets/secret_key
+      - ENABLE_WEB_READER=true
+      - STORYTELLER_LOG_LEVEL=trace
+    ports:
+      - "8001:8001"
+    secrets:
+      - secret_key
+    
+
+# IMPORTANT: Add this secrets block
+secrets:
+  secret_key:
+    file: ./STORYTELLER_SECRET_KEY.txt
+    
