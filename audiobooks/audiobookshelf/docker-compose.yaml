@@ -1,0 +1,14 @@
+services:
+  audiobookshelf:
+    restart: unless-stopped
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    ports:
+      - 12250:80
+    volumes:
+      - ./Audiobooks:/audiobooks
+      - ./Books:/books
+      - ./Podcasts:/podcasts
+      - ./config:/config
+      - ./metadata:/metadata
+    environment:
+      - TZ=India/Kolkata
