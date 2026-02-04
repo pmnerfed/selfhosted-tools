@@ -1,0 +1,49 @@
+# Karakeep (previously Hoarder) is an open source "Bookmark Everything" app that uses AI for automatically tagging the content you throw at it.
+# Though AI never really worked for me, im using it only for keep all my bookmarks in one place.
+# Reference: https://docs.karakeep.app/
+
+# Though this can use chrome headless to fetch webpage contents,
+# a lot of pages might be behind cloudflare or it just doesnt do a good job fetching, 
+# I use it with `SingleFile` instead
+
+# Note: You need to install a companion browser extension to easily bookmark pages.
+# Other extensions can save here too, like I use singleFile
+
+services:
+  web:
+    image: ghcr.io/karakeep-app/karakeep:${KARAKEEP_VERSION:-release}
+    restart: unless-stopped
+    volumes:
+      - ./data:/data
+    ports:
+      - 3000:3000
+    env_file:
+      - .env
+    environment:
+      MEILI_ADDR: http://meilisearch:7700
+      BROWSER_WEB_URL: http://chrome:9222
+      # OPENAI_API_KEY: ...
+      DATA_DIR: /data # DON'T CHANGE THIS
+  chrome: # used for browsing the data
+    image: gcr.io/zenika-hub/alpine-chrome:124
+    restart: unless-stopped
+    command:
+      - --no-sandbox
+      - --disable-gpu
+      - --disable-dev-shm-usage
+      - --remote-debugging-address=0.0.0.0
+      - --remote-debugging-port=9222
+      - --hide-scrollbars
+  meilisearch:
+    image: getmeili/meilisearch:v1.13.3
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - meilisearch:/meili_data
+
+volumes:
+  meilisearch:
+  data:
