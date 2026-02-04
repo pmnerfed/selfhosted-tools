@@ -1,3 +1,6 @@
+# Audiobookshelf is an open-source self-hosted media server for your audiobooks and podcasts.
+# Reference: https://www.audiobookshelf.org/docs
+
 services:
   audiobookshelf:
     restart: unless-stopped
